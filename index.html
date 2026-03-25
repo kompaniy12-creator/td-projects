@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>A.R.C.H.O.N. — Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg:#050507;--surface:#0a0805;--card:#111008;--card-hover:#1a1610;
+      --border:rgba(255,170,0,0.08);--glow:rgba(255,170,0,0.15);
+      --text:#f0e6d0;--muted:#8a7a5a;
+      --gold:#ffc107;--gold-dim:#b8860b;--red:#e53935;--red-dim:#b71c1c;
+      --blue:#42a5f5;--cyan:#00e5ff;--green:#66bb6a;--purple:#ab47bc;
+      --arc-glow:rgba(0,229,255,0.3);--arc-core:#00e5ff;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+    /* Iron Man HUD Background */
+    .hud-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+    .hud-circle{position:absolute;border:1px solid rgba(255,170,0,0.06);border-radius:50%}
+    .hud-circle.c1{width:800px;height:800px;top:-200px;left:50%;transform:translateX(-50%);animation:rotate 60s linear infinite}
+    .hud-circle.c2{width:600px;height:600px;top:-100px;left:50%;transform:translateX(-50%);animation:rotate 45s linear infinite reverse}
+    .hud-circle.c3{width:400px;height:400px;top:0;left:50%;transform:translateX(-50%);border-color:rgba(0,229,255,0.05)}
+    @keyframes rotate{from{transform:translateX(-50%) rotate(0deg)}to{transform:translateX(-50%) rotate(360deg)}}
+    .hud-lines{position:absolute;inset:0;background-image:
+      linear-gradient(rgba(255,170,0,0.02) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,170,0,0.02) 1px,transparent 1px);
+      background-size:80px 80px}
+    .arc-glow{position:fixed;top:80px;left:50%;transform:translateX(-50%);width:200px;height:200px;
+      background:radial-gradient(circle,rgba(0,229,255,0.12),transparent 70%);border-radius:50%;
+      animation:pulse-arc 4s ease-in-out infinite;pointer-events:none;z-index:0}
+    @keyframes pulse-arc{0%,100%{opacity:.4;transform:translateX(-50%) scale(1)}50%{opacity:.8;transform:translateX(-50%) scale(1.15)}}
+    .scanline{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,229,255,0.1),transparent);
+      animation:scan 8s linear infinite;pointer-events:none;z-index:999}
+    @keyframes scan{from{top:0}to{top:100vh}}
+
+    .content{position:relative;z-index:1;max-width:960px;margin:0 auto}
+
+    /* Hero — Arc Reactor */
+    .hero{text-align:center;padding:40px 20px 20px;position:relative}
+    .arc-reactor{width:80px;height:80px;margin:0 auto 16px;position:relative}
+    .arc-reactor .ring{position:absolute;inset:0;border:2px solid rgba(0,229,255,0.3);border-radius:50%;
+      animation:rotate 10s linear infinite}
+    .arc-reactor .ring2{position:absolute;inset:8px;border:1px solid rgba(0,229,255,0.2);border-radius:50%;
+      animation:rotate 7s linear infinite reverse}
+    .arc-reactor .core{position:absolute;inset:16px;background:radial-gradient(circle,var(--arc-core),rgba(0,229,255,0.3),transparent);
+      border-radius:50%;box-shadow:0 0 30px var(--arc-glow),0 0 60px rgba(0,229,255,0.15);animation:pulse-arc 3s ease-in-out infinite}
+    .arc-reactor .tri{position:absolute;inset:20px;display:flex;align-items:center;justify-content:center}
+    .arc-reactor .tri::before{content:'⚡';font-size:22px;filter:drop-shadow(0 0 8px var(--arc-core))}
+    .hero h1{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;letter-spacing:4px;
+      background:linear-gradient(135deg,#ffd54f,#ffc107,#ff8f00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      filter:drop-shadow(0 0 20px rgba(255,193,7,0.3))}
+    .hero .sub{font-family:'Orbitron',sans-serif;font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:3px;text-transform:uppercase}
+    .hero .status-bar{margin-top:12px;display:flex;justify-content:center;gap:16px;font-size:10px;font-family:'Orbitron',sans-serif}
+    .status-item{display:flex;align-items:center;gap:4px}
+    .status-dot{width:6px;height:6px;border-radius:50%;animation:blink 2s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+    /* Tabs — HUD style */
+    .tabs{display:flex;justify-content:center;gap:4px;padding:0 16px 16px;flex-wrap:wrap}
+    .tab{background:rgba(255,170,0,0.04);border:1px solid rgba(255,170,0,0.1);border-radius:4px;padding:8px 18px;
+      color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;transition:.2s;
+      font-family:'Orbitron',sans-serif;letter-spacing:1px;text-transform:uppercase}
+    .tab:hover{color:var(--gold);border-color:rgba(255,170,0,0.3);box-shadow:0 0 12px rgba(255,170,0,0.1)}
+    .tab.active{background:linear-gradient(135deg,rgba(255,170,0,0.15),rgba(255,140,0,0.1));
+      color:var(--gold);border-color:var(--gold-dim);box-shadow:0 0 20px rgba(255,170,0,0.15),inset 0 0 20px rgba(255,170,0,0.05)}
+
+    /* Section */
+    .section{padding:0 16px;margin-bottom:24px}
+    .section-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;color:var(--gold-dim);
+      text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .section-title .line{flex:1;height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent)}
+
+    /* Analytics grid */
+    .analytics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    @media(min-width:640px){.analytics-grid{grid-template-columns:repeat(4,1fr)}}
+    .a-card{background:linear-gradient(135deg,rgba(255,170,0,0.03),rgba(0,0,0,0.3));
+      border:1px solid rgba(255,170,0,0.08);border-radius:8px;padding:14px;position:relative;overflow:hidden}
+    .a-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,170,0,0.2),transparent)}
+    .a-card .a-icon{font-size:20px;margin-bottom:6px}
+    .a-card .a-num{font-size:26px;font-weight:800;line-height:1;font-family:'Orbitron',sans-serif}
+    .a-card .a-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;
+      font-weight:700;font-family:'Orbitron',sans-serif}
+    .a-card .a-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .a-card .glow-dot{position:absolute;top:8px;right:8px;width:5px;height:5px;border-radius:50%;animation:blink 3s ease-in-out infinite}
+
+    /* Donut */
+    .donut-row{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:center}
+    .donut-container{position:relative;width:160px;height:160px;flex-shrink:0}
+    .donut-container canvas{width:160px;height:160px}
+    .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .donut-center .big{font-size:28px;font-weight:800;font-family:'Orbitron',sans-serif;color:var(--gold)}
+    .donut-center .small{font-size:9px;color:var(--muted);text-transform:uppercase;font-family:'Orbitron',sans-serif;letter-spacing:1px}
+    .donut-legend{display:flex;flex-direction:column;gap:6px}
+    .legend-item{display:flex;align-items:center;gap:8px;font-size:12px}
+    .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+    .legend-val{color:var(--muted);margin-left:auto;font-weight:700;min-width:24px;text-align:right;font-family:'Orbitron',sans-serif}
+
+    /* Bar chart */
+    .bar-chart{display:flex;flex-direction:column;gap:8px}
+    .bar-row{display:flex;align-items:center;gap:10px}
+    .bar-label{font-size:12px;min-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bar-track{flex:1;height:6px;background:rgba(255,170,0,0.04);border-radius:3px;overflow:hidden;border:1px solid rgba(255,170,0,0.06)}
+    .bar-fill{height:100%;border-radius:3px;transition:width 1s ease;box-shadow:0 0 6px rgba(255,170,0,0.2)}
+    .bar-val{font-size:11px;color:var(--gold-dim);font-weight:700;min-width:30px;text-align:right;font-family:'Orbitron',sans-serif}
+
+    /* AI Agents grid */
+    .agents-grid{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:500px){.agents-grid{grid-template-columns:repeat(2,1fr)}}
+    .agent-card{background:linear-gradient(135deg,rgba(255,170,0,0.04),rgba(0,0,0,0.4));
+      border:1px solid rgba(255,170,0,0.1);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+    .agent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+    .agent-card .ag-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .agent-card .ag-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+      font-size:24px;position:relative;flex-shrink:0}
+    .agent-card .ag-avatar::after{content:'';position:absolute;inset:-2px;border-radius:50%;
+      border:1px solid rgba(0,229,255,0.2);animation:rotate 15s linear infinite}
+    .agent-card .ag-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:800;letter-spacing:2px}
+    .agent-card .ag-role{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'Orbitron',sans-serif}
+    .agent-card .ag-desc{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:8px}
+    .agent-card .ag-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;
+      padding:3px 10px;border-radius:4px;font-family:'Orbitron',sans-serif;letter-spacing:1px}
+    .ag-online{background:rgba(102,187,106,0.1);color:var(--green);border:1px solid rgba(102,187,106,0.2)}
+    .ag-offline{background:rgba(255,170,0,0.05);color:var(--muted);border:1px solid rgba(255,170,0,0.1)}
+    .agent-card .ag-bot{font-size:10px;color:var(--cyan);margin-top:6px;font-family:'Orbitron',sans-serif}
+
+    /* Business breakdown */
+    .biz-breakdown{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:640px){.biz-breakdown{grid-template-columns:repeat(2,1fr)}}
+    .biz-card{background:linear-gradient(135deg,rgba(255,170,0,0.03),rgba(0,0,0,0.3));
+      border:1px solid rgba(255,170,0,0.08);border-radius:10px;padding:16px;position:relative;overflow:hidden}
+    .biz-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,170,0,0.15),transparent)}
+    .biz-card .biz-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .biz-card .biz-badge{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .biz-card .biz-name{font-size:13px;font-weight:700;flex:1}
+    .biz-card .biz-pct{font-size:20px;font-weight:800;font-family:'Orbitron',sans-serif}
+    .biz-mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .biz-mini{text-align:center}
+    .biz-mini .mn{font-size:16px;font-weight:700;font-family:'Orbitron',sans-serif}
+    .biz-mini .ml{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-family:'Orbitron',sans-serif}
+    .biz-progress{height:3px;background:rgba(255,170,0,0.04);border-radius:2px;margin-top:8px;overflow:hidden}
+    .biz-progress-fill{height:100%;border-radius:2px;box-shadow:0 0 8px rgba(255,170,0,0.3)}
+
+    /* Project cards */
+    .projects-grid{display:grid;grid-template-columns:1fr;gap:10px}
+    @media(min-width:640px){.projects-grid{grid-template-columns:repeat(2,1fr)}}
+    .p-card{background:linear-gradient(135deg,rgba(255,170,0,0.03),rgba(0,0,0,0.4));
+      border:1px solid rgba(255,170,0,0.08);border-radius:10px;padding:16px;
+      cursor:pointer;transition:.3s;position:relative;overflow:hidden}
+    .p-card:hover{border-color:rgba(255,170,0,0.2);box-shadow:0 0 20px rgba(255,170,0,0.08),0 8px 32px rgba(0,0,0,0.3)}
+    .p-card .status-line{position:absolute;top:0;left:16px;right:16px;height:2px;border-radius:0 0 2px 2px}
+    .p-head{display:flex;align-items:flex-start;gap:12px}
+    .p-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+    .p-meta{flex:1;min-width:0}
+    .p-name{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .p-desc{font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
+    .badge{font-size:9px;font-weight:700;padding:3px 10px;border-radius:4px;text-transform:uppercase;
+      letter-spacing:.5px;white-space:nowrap;font-family:'Orbitron',sans-serif}
+    .badge-done{background:rgba(102,187,106,.1);color:var(--green);border:1px solid rgba(102,187,106,.15)}
+    .badge-active{background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.15)}
+    .badge-blocked{background:rgba(229,57,53,.1);color:var(--red);border:1px solid rgba(229,57,53,.15)}
+    .badge-todo{background:rgba(171,71,188,.1);color:var(--purple);border:1px solid rgba(171,71,188,.15)}
+    .p-footer{display:flex;align-items:center;gap:8px;margin-top:10px}
+    .tags{display:flex;flex-wrap:wrap;gap:3px;flex:1}
+    .tag{font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;background:rgba(255,170,0,.04);color:var(--muted);border:1px solid rgba(255,170,0,.05)}
+    .tag-bot{color:var(--cyan);border-color:rgba(0,229,255,.12);background:rgba(0,229,255,.04)}
+    .cp{width:36px;height:36px;flex-shrink:0;position:relative}
+    .cp svg{width:36px;height:36px;transform:rotate(-90deg)}
+    .cp .track{fill:none;stroke:rgba(255,170,0,.06);stroke-width:3}
+    .cp .bar{fill:none;stroke-width:3;stroke-linecap:round}
+    .cp .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      font-size:9px;font-weight:700;font-family:'Orbitron',sans-serif}
+    .p-details{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+    .p-card.expanded .p-details{max-height:600px}
+    .p-details-inner{padding-top:12px;margin-top:12px;border-top:1px solid rgba(255,170,0,0.06)}
+    .dg{margin-bottom:10px}
+    .dg h4{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-family:'Orbitron',sans-serif}
+    .dg h4.h-red{color:var(--red)}.dg h4.h-yel{color:var(--gold)}.dg h4.h-grn{color:var(--green)}
+    .di{font-size:12px;padding:4px 0 4px 16px;position:relative;line-height:1.4}
+    .di::before{content:'';position:absolute;left:0;top:10px;width:6px;height:6px;border-radius:2px}
+    .di.di-r{color:var(--red)}.di.di-r::before{background:var(--red)}
+    .di.di-t{color:var(--text)}.di.di-t::before{background:var(--gold)}
+    .di.di-d{color:var(--muted);text-decoration:line-through;opacity:.4}.di.di-d::before{background:var(--green);opacity:.4}
+    .expand-hint{text-align:center;margin-top:8px;font-size:10px;color:var(--muted);opacity:.3;font-family:'Orbitron',sans-serif}
+    .p-card.expanded .expand-hint{display:none}
+    .filter-bar{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}
+
+    /* Timeline */
+    .timeline{display:flex;flex-direction:column;gap:0}
+    .tl-item{display:flex;gap:12px;position:relative}
+    .tl-dot-col{display:flex;flex-direction:column;align-items:center;width:20px;flex-shrink:0}
+    .tl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;z-index:1;box-shadow:0 0 8px rgba(255,170,0,0.2)}
+    .tl-line{width:1px;flex:1;background:linear-gradient(180deg,rgba(255,170,0,0.15),rgba(255,170,0,0.03))}
+    .tl-content{padding-bottom:16px;flex:1}
+    .tl-date{font-size:10px;color:var(--gold-dim);font-weight:700;text-transform:uppercase;font-family:'Orbitron',sans-serif;letter-spacing:1px}
+    .tl-text{font-size:13px;margin-top:2px}
+
+    /* Daily chart */
+    .daily-bar{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1}
+
+    .footer{text-align:center;padding:24px 16px;font-size:10px;color:var(--muted)}
+    .footer a{color:var(--gold-dim);text-decoration:none;font-family:'Orbitron',sans-serif}
+
+    .page{display:none}.page.active{display:block}
+  </style>
+</head>
+<body>
+<div class="hud-bg">
+  <div class="hud-circle c1"></div>
+  <div class="hud-circle c2"></div>
+  <div class="hud-circle c3"></div>
+  <div class="hud-lines"></div>
+</div>
+<div class="arc-glow"></div>
+<div class="scanline"></div>
+
+<div class="content">
+
+<div class="hero">
+  <div class="arc-reactor">
+    <div class="ring"></div><div class="ring2"></div><div class="core"></div><div class="tri"></div>
+  </div>
+  <h1>A.R.C.H.O.N.</h1>
+  <div class="sub">Command Center • System Overview</div>
+  <div class="status-bar">
+    <div class="status-item"><div class="status-dot" style="background:var(--green)"></div><span style="color:var(--green)">ONLINE</span></div>
+    <div class="status-item"><span style="color:var(--muted)">AGENTS:</span><span style="color:var(--cyan)" id="agentCount"></span></div>
+    <div class="status-item"><span style="color:var(--muted)">PROJECTS:</span><span style="color:var(--gold)" id="projectCount"></span></div>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-page="overview">⚡ Обзор</button>
+  <button class="tab" data-page="agents">🤖 Агенты</button>
+  <button class="tab" data-page="analytics">📊 Аналитика</button>
+  <button class="tab" data-page="projects">📁 Проекты</button>
+  <button class="tab" data-page="planned">🚀 Roadmap</button>
+  <button class="tab" data-page="timeline">📅 Таймлайн</button>
+</div>
+
+<!-- ═══ OVERVIEW ═══ -->
+<div class="page active" id="page-overview">
+  <div class="section">
+    <div class="section-title">⚡ System Status <div class="line"></div></div>
+    <div class="analytics-grid" id="mainStats"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🤖 AI Agents <div class="line"></div></div>
+    <div class="agents-grid" id="agentsOverview"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🏢 Business Units <div class="line"></div></div>
+    <div class="biz-breakdown" id="bizBreakdown"></div>
+  </div>
+</div>
+
+<!-- ═══ AGENTS ═══ -->
+<div class="page" id="page-agents">
+  <div class="section">
+    <div class="section-title">🤖 AI Agent Registry <div class="line"></div></div>
+    <div id="agentsFull"></div>
+  </div>
+</div>
+
+<!-- ═══ ANALYTICS ═══ -->
+<div class="page" id="page-analytics">
+  <div class="section">
+    <div class="section-title">🎯 По статусам <div class="line"></div></div>
+    <div class="donut-row">
+      <div class="donut-container"><canvas id="statusDonut" width="320" height="320"></canvas>
+        <div class="donut-center"><div class="big" id="donutTotal"></div><div class="small">projects</div></div>
+      </div>
+      <div class="donut-legend" id="statusLegend"></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">⏱️ Время разработки <div class="line"></div></div>
+    <div class="analytics-grid" id="timeStats"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📊 Прогресс по проектам <div class="line"></div></div>
+    <div class="bar-chart" id="progressBars"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">💸 Ресурсы и затраты <div class="line"></div></div>
+    <div class="analytics-grid" id="resourceStats"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🤖 AI Models <div class="line"></div></div>
+    <div class="bar-chart" id="modelBars"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">📅 Activity Log <div class="line"></div></div>
+    <div style="display:flex;gap:4px;align-items:flex-end;height:100px;padding:8px 0" id="dailyChart"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">🛠️ Tech Stack <div class="line"></div></div>
+    <div class="bar-chart" id="techBars"></div>
+  </div>
+</div>
+
+<!-- ═══ PROJECTS ═══ -->
+<div class="page" id="page-projects">
+  <div class="section">
+    <div class="filter-bar" id="filterBar"></div>
+    <div id="projectsList"></div>
+  </div>
+</div>
+
+<!-- ═══ PLANNED ═══ -->
+<div class="page" id="page-planned">
+  <div class="section">
+    <div class="section-title">🚀 Planned Agent Roadmap <div class="line"></div></div>
+    <div id="plannedAgents"></div>
+  </div>
+</div>
+
+<!-- ═══ TIMELINE ═══ -->
+<div class="page" id="page-timeline">
+  <div class="section">
+    <div class="section-title">📅 Development Log <div class="line"></div></div>
+    <div class="timeline" id="timelineList"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div id="lastUpdated">🕐 Обновлено: 25.03.2026 01:25 | 6/6 агентов | 9/11 сервисов | ⚡ Auto-Update</div>
+  <div style="margin-top:4px">Powered by <a href="#">A.R.C.H.O.N.</a> ⚡ Stark Industries Style</div>
+</div>
+
+</div>
+<script>
+// ═══ AGENTS ═══
+const AGENTS = [
+  {name:"A.R.C.H.O.N.",full:"Autonomous Response & Command Hub for Optimized Networks",
+    role:"Founder / System Architect",emoji:"🔱",
+    color:"#ffc107",bg:"linear-gradient(135deg,#1a1400,#2a2000)",border:"rgba(255,193,7,0.2)",
+    desc:"Главный интеллект системы. Управляет всеми ботами, принимает стратегические решения, синхронизирует бизнес.",
+    bot:"@nexusassbot",status:"online"},
+  {name:"N.E.X.U.S.",full:"Network for Execution & Unified Systems",
+    role:"CEO / Personal Assistant",emoji:"🧠",
+    color:"#42a5f5",bg:"linear-gradient(135deg,#001428,#002040)",border:"rgba(66,165,245,0.2)",
+    desc:"Операционное управление. Голосовые команды, звонки, сообщения, задачи, календарь. Самоулучшающийся.",
+    bot:"@nexus_prrsonal_bot",status:"online"},
+  {name:"A.U.R.U.M.",full:"Automated Universal Resource & Utility Manager",
+    role:"CFO / Financial Analyst",emoji:"💰",
+    color:"#66bb6a",bg:"linear-gradient(135deg,#001400,#002800)",border:"rgba(102,187,106,0.2)",
+    desc:"Финансовый интеллект. Чеки, голосовые, текст → Notion. Анализ расходов и прибыли.",
+    bot:"@TDfinanalyst_bot",status:"online"},
+  {name:"O.S.C.A.R.",full:"Office System for Contracts, Automation & Reporting",
+    role:"COO / Office Manager",emoji:"📋",
+    color:"#ab47bc",bg:"linear-gradient(135deg,#140028,#200040)",border:"rgba(171,71,188,0.2)",
+    desc:"Офисный ассистент. Генерация договоров, Bitrix24, CEIDG, задачи на оплату.",
+    bot:"@TDAsystentBiurowybot",status:"online"},
+  {name:"S.I.R.E.N.",full:"Sales Intelligence & Revenue Enhancement Network",
+    role:"CSO / Sales Intelligence",emoji:"📡",
+    color:"#e53935",bg:"linear-gradient(135deg,#280000,#400000)",border:"rgba(229,57,53,0.2)",
+    desc:"Аналитика продаж. Дайджесты, зависшие сделки, конверсия воронок, еженедельные отчёты.",
+    bot:"@siren_sales_bot",status:"online"},
+  {name:"S.E.N.T.R.Y.",full:"System Environment & Network Testing Registry",
+    role:"CTO / Infrastructure Monitor",emoji:"🛡️",
+    color:"#607d8b",bg:"linear-gradient(135deg,#1a2327,#2c3e45)",border:"rgba(96,125,139,0.2)",
+    desc:"Фоновый мониторинг всех сервисов. Автоперезапуск, алерты, утренние отчёты.",
+    bot:"daemon",status:"online"},
+];
+
+// ═══ PLANNED AGENTS ═══
+const PLANNED = [
+  {name:"O.R.A.C.L.E.",full:"Operational Research & Analytics for Client Lifecycle Enhancement",
+    role:"CDO / Data Analytics",emoji:"🔮",tier:1,
+    color:"#9c27b0",bg:"linear-gradient(135deg,#1a002e,#2e0050)",border:"rgba(156,39,176,0.2)",
+    desc:"Предиктивная аналитика. Прогноз оттока клиентов, рекомендации, когортный анализ, LTV расчёты.",
+    planned:["Прогноз конверсии","Когорты клиентов","LTV/CAC","Рекомендации менеджерам"]},
+  {name:"H.E.R.M.E.S.",full:"Hub for Email, Routing & Messaging Exchange Systems",
+    role:"CCO / Communications",emoji:"📬",tier:2,
+    color:"#00bcd4",bg:"linear-gradient(135deg,#001a20,#002830)",border:"rgba(0,188,212,0.2)",
+    desc:"Единый хаб коммуникаций. WhatsApp, Telegram, Email, SMS — всё в одном месте с AI-маршрутизацией.",
+    planned:["WhatsApp WABA","Telegram Open Lines","Email автоответы","Маршрутизация по менеджерам"]},
+  {name:"P.H.O.E.N.I.X.",full:"Platform for Holistic Onboarding, Education & Next-gen Integration eXperience",
+    role:"CHRO / HR & Onboarding",emoji:"🔥",tier:3,
+    color:"#ff5722",bg:"linear-gradient(135deg,#2a0800,#401000)",border:"rgba(255,87,34,0.2)",
+    desc:"Онбординг сотрудников и клиентов. Обучающие сценарии, чек-листы, автоматическая адаптация.",
+    planned:["Чек-лист онбординга","Обучающие модули","Тестирование знаний","Автоматизация HR"]},
+  {name:"S.P.H.I.N.X.",full:"Secure Protocol Handler for Intelligent Network eXchanges",
+    role:"CISO / Security",emoji:"🗿",tier:3,
+    color:"#795548",bg:"linear-gradient(135deg,#1a1008,#2a1810)",border:"rgba(121,85,72,0.2)",
+    desc:"Безопасность и комплаенс. Мониторинг доступов, аудит, GDPR, шифрование, двухфакторка.",
+    planned:["Аудит доступов","GDPR контроль","Мониторинг утечек","2FA enforcement"]},
+];
+
+// ═══ PROJECTS ═══
+const P = [
+  {biz:"Twoja Decyzja",icon:"🤖",bg:"linear-gradient(135deg,#b8860b,#ffc107)",
+    name:"Реферальный бот",desc:"Лояльность: рефералы, скидки, кешбэк, промокоды",
+    status:"done",progress:100,tags:["Telegram","Supabase","Python"],bot:"@twojadecyzjarefbot",
+    hours:40,done:["Полная реферальная система","Админ-панель","Скидка+кешбэк","Выплаты","Промокоды"],
+    todo:["Авто-напоминания","Лидерборд","QR-коды"]},
+  {biz:"Twoja Decyzja",icon:"📋",bg:"linear-gradient(135deg,#7b1fa2,#ab47bc)",
+    name:"O.S.C.A.R.",desc:"Договоры: Bitrix24 + CEIDG → DOCX/PDF + Iron Man HUD",
+    status:"online",progress:95,tags:["Bitrix24","Bitrix Disk","Gotenberg"],bot:"@TDAsystentBiurowybot",
+    hours:45,done:["Pakiet 2 из Bitrix24","DOCX→PDF","JDG CEIDG","JDG Google Docs","Доступ","Задачи","Iron Man HUD","Disk Upload (2-step)","Toolbar Button (CRM_DEAL_DETAIL_TOOLBAR)"],
+    todo:["Google OAuth","E-подпись","Pakiet 1,3,4"],blocked:["Google OAuth","E-подпись"]},
+  {biz:"Twoja Decyzja",icon:"📡",bg:"linear-gradient(135deg,#1b5e20,#66bb6a)",
+    name:"TD Monitor",desc:"Юзербот: мониторинг BNB + News Hunter",
+    status:"done",progress:95,tags:["Telethon","Whisper"],hours:20,
+    done:["27 ключевых слов","Пересылка","News Hunter","Транскрипция"],todo:["Авто-дайджест"]},
+  {biz:"Twoja Decyzja",icon:"📞",bg:"linear-gradient(135deg,#e65100,#ff9800)",
+    name:"AI Голосовые звонки",desc:"Zadarma SIP + Vapi + Claude + ElevenLabs",
+    status:"done",progress:100,tags:["Vapi","Zadarma","Claude","ElevenLabs"],hours:25,
+    done:["BYO SIP trunk","Голос Radislav","Claude Sonnet","5 звонков","Inline assistant"],todo:["Вебхук входящих"]},
+  {biz:"Twoja Decyzja",icon:"🏢",bg:"linear-gradient(135deg,#0d47a1,#42a5f5)",
+    name:"Virtual Office",desc:"WebApp — обзор сервисов",
+    status:"done",progress:100,tags:["HTML","WebApp"],hours:5,done:["Карточки","Статусы","Кнопка Office"],todo:[]},
+  {biz:"Twoja Decyzja",icon:"🔍",bg:"linear-gradient(135deg,#b71c1c,#e53935)",
+    name:"Проверка статуса дел",desc:"Автопроверка карт побыту",
+    status:"blocked",progress:30,tags:["Playwright","reCAPTCHA"],hours:8,
+    done:["Playwright+stealth","Автозаполнение"],todo:["2Captcha","Солвер"],blocked:["reCAPTCHA","API-ключ"]},
+  {biz:"TD Consulting Group",icon:"💼",bg:"linear-gradient(135deg,#004d40,#26a69a)",
+    name:"Twój Księgowy Bot",desc:"AI бухгалтер: Claude + wFirma",
+    status:"active",progress:60,tags:["Claude","Supabase","wFirma"],bot:"@twojksiegowy_bot",
+    hours:30,done:["Тестовая группа","93 клиента","Supabase","/reload_clients"],
+    todo:["Google Sheets","Production","База знаний"]},
+  {biz:"TD Consulting Group",icon:"🔄",bg:"linear-gradient(135deg,#006064,#00acc1)",
+    name:"wFirma Sync",desc:"469 контрагентов + 745 счетов → Supabase",
+    status:"done",progress:100,tags:["wFirma","OAuth 2.0","Cron"],hours:20,
+    done:["OAuth 2.0","469 контрагентов","745 счетов","Cron 2ч"],todo:[]},
+  {biz:"TD Consulting Group",icon:"⚠️",bg:"linear-gradient(135deg,#e65100,#ff9800)",
+    name:"Уведомления о долгах",desc:"Автоуведомления при просрочке >30 дней",
+    status:"active",progress:70,tags:["apscheduler","wFirma"],hours:10,
+    done:["Проверка 6ч","Порог 30 дней","Разрешения"],todo:["Маппинг","Дайджест"]},
+  {biz:"TD Consulting Group",icon:"📊",bg:"linear-gradient(135deg,#4a148c,#7b1fa2)",
+    name:"Bitrix24 Пайплайны",desc:"CRM: пайплайны + авто-перенос",
+    status:"done",progress:90,tags:["Bitrix24"],hours:8,
+    done:["Pipeline 13","Pipeline 19","Авто-перенос"],todo:["Авто-стадии wFirma"]},
+  {biz:"K&KUM International",icon:"🤝",bg:"linear-gradient(135deg,#e65100,#ff6d00)",
+    name:"K&KUM Sales Bot",desc:"AI-менеджер: Claude Sonnet",
+    status:"done",progress:95,tags:["Claude Sonnet","Lead Gen"],hours:15,
+    done:["AI диалог","RU/UA/EN/PL","Каталог","Статистика"],todo:["Демо-режим"]},
+  {biz:"K&KUM International",icon:"🌐",bg:"linear-gradient(135deg,#4a148c,#9c27b0)",
+    name:"Фриланс-платформы",desc:"Upwork + Fiverr + Useme",
+    status:"todo",progress:10,tags:["Upwork","Fiverr"],hours:3,
+    done:["Анализ 8+ платформ"],todo:["Профили","Портфолио","4 гига"]},
+  {biz:"Личные",icon:"🧠",bg:"linear-gradient(135deg,#0d47a1,#42a5f5)",
+    name:"N.E.X.U.S.",desc:"Персональный ассистент: голос, звонки, задачи",
+    status:"online",progress:90,tags:["Claude Sonnet","Whisper","Vapi"],bot:"@nexus_prrsonal_bot",
+    hours:6,done:["Голосовые команды","AI brain","Звонки","Сообщения","Задачи","Погода","Брифинги","Self-improve"],
+    todo:["Google Calendar","Gmail","Привычки"]},
+  {biz:"Личные",icon:"💰",bg:"linear-gradient(135deg,#1b5e20,#66bb6a)",
+    name:"A.U.R.U.M.",desc:"Финансовый аналитик: чеки → SQLite + дашборд",
+    status:"online",progress:100,tags:["Claude Vision","Whisper","SQLite"],bot:"@TDfinanalyst_bot",
+    hours:12,done:["OCR чеков","Голосовые","Текст","16 категорий","SQLite","Дашборд","Бюджеты","Мульти-счета","Инвестиции","Динамика баланса","Статистика","FAB +","Редактирование","Notion DB fix"],
+    todo:["Банковская синхронизация","Групповой доступ"]},
+  {biz:"Инфраструктура",icon:"🔐",bg:"linear-gradient(135deg,#37474f,#607d8b)",
+    name:"Google Workspace",desc:"Календарь, Drive, Sheets, Gmail",
+    status:"blocked",progress:80,tags:["Google API"],hours:6,
+    done:["Календарь, Drive, Sheets"],todo:["OAuth re-auth"],blocked:["Токен протух"]},
+  {biz:"Инфраструктура",icon:"💬",bg:"linear-gradient(135deg,#1b5e20,#43a047)",
+    name:"WhatsApp+Telegram→Bitrix",desc:"Open Lines",
+    status:"todo",progress:0,tags:["WhatsApp","Bitrix24"],hours:0,done:[],todo:["WABA","Telegram"]},
+  {biz:"Инфраструктура",icon:"✍️",bg:"linear-gradient(135deg,#b71c1c,#d32f2f)",
+    name:"E-подпись",desc:"Autenti / Yousign",
+    status:"blocked",progress:15,tags:["Autenti"],hours:4,
+    done:["Autenti приложение","Анализ альтернатив"],todo:["Выбрать сервис"],blocked:["APIv2"]},
+  {biz:"Инфраструктура",icon:"📡",bg:"linear-gradient(135deg,#b71c1c,#e53935)",
+    name:"S.I.R.E.N.",desc:"Sales Intelligence: дайджесты, зависшие сделки, воронки",
+    status:"online",progress:100,tags:["Bitrix24","APScheduler","Claude"],bot:"@siren_sales_bot",
+    hours:8,done:["Дайджест 09:00","Зависшие сделки 6ч","Еженедельный Mon 09:00","Аналитика воронок","Форматирование"],todo:[]},
+  {biz:"Инфраструктура",icon:"🛡️",bg:"linear-gradient(135deg,#37474f,#607d8b)",
+    name:"S.E.N.T.R.Y.",desc:"Мониторинг 10 сервисов, автоперезапуск, алерты",
+    status:"online",progress:100,tags:["psutil","httpx","daemon"],
+    hours:5,done:["Мониторинг 60с","Автоперезапуск","Алерты Telegram","Утренний отчёт 08:00","cwd-based PID detection"],todo:[]},
+  {biz:"Инфраструктура",icon:"📊",bg:"linear-gradient(135deg,#004d40,#26a69a)",
+    name:"Projects Dashboard",desc:"Iron Man HUD дашборд + авто-обновление каждый час",
+    status:"done",progress:95,tags:["HTML","Netlify","Cron"],
+    hours:10,done:["Iron Man дизайн","5 вкладок","Netlify deploy","Авто-обновление статусов","Bitrix/Supabase данные"],todo:["Живые графики"]},
+];
+
+// ═══ COMPUTED ═══
+const BIZ_META = {
+  "Twoja Decyzja":{icon:"🇵🇱",color:"#ffc107"},
+  "TD Consulting Group":{icon:"📊",color:"#26a69a"},
+  "K&KUM International":{icon:"🚀",color:"#ff6d00"},
+  "Личные":{icon:"👤",color:"#42a5f5"},
+  "Инфраструктура":{icon:"⚙️",color:"#607d8b"}
+};
+const ST={done:"Online",active:"Active",blocked:"Blocked",todo:"Standby"};
+const SC={done:"var(--green)",active:"var(--cyan)",blocked:"var(--red)",todo:"var(--purple)"};
+
+const totalProjects=P.length,totalHours=P.reduce((s,p)=>s+p.hours,0);
+const totalDone=P.reduce((s,p)=>s+p.done.length,0),totalTodo=P.reduce((s,p)=>s+p.todo.length,0);
+const avgProgress=Math.round(P.reduce((s,p)=>s+p.progress,0)/P.length);
+const statusCounts={};P.forEach(p=>{statusCounts[p.status]=(statusCounts[p.status]||0)+1});
+const bizGroups={};P.forEach(p=>{if(!bizGroups[p.biz])bizGroups[p.biz]=[];bizGroups[p.biz].push(p)});
+const estRemaining=totalTodo*2;
+const techCount={};P.forEach(p=>p.tags.forEach(t=>{techCount[t]=(techCount[t]||0)+1}));
+const techSorted=Object.entries(techCount).sort((a,b)=>b[1]-a[1]);
+
+document.getElementById('agentCount').textContent=AGENTS.filter(a=>a.status==='online').length;
+document.getElementById('projectCount').textContent=totalProjects;
+
+// ═══ RENDER OVERVIEW ═══
+function renderOverview(){
+  document.getElementById('mainStats').innerHTML=`
+    <div class="a-card"><div class="a-icon">📁</div><div class="a-num" style="color:var(--gold)">${totalProjects}</div><div class="a-label">Projects</div></div>
+    <div class="a-card"><div class="glow-dot" style="background:var(--green)"></div><div class="a-icon">✅</div><div class="a-num" style="color:var(--green)">${totalDone}</div><div class="a-label">Completed</div><div class="a-sub">из ${totalDone+totalTodo}</div></div>
+    <div class="a-card"><div class="a-icon">⏱️</div><div class="a-num" style="color:var(--cyan)">${totalHours}ч</div><div class="a-label">Dev Time</div><div class="a-sub">${Math.round(totalHours/8)} рабочих дней</div></div>
+    <div class="a-card"><div class="a-icon">📈</div><div class="a-num" style="color:var(--gold)">${avgProgress}%</div><div class="a-label">Progress</div></div>
+  `;
+  // Agents overview
+  document.getElementById('agentsOverview').innerHTML=AGENTS.map(a=>`
+    <div class="agent-card" style="background:${a.bg};border-color:${a.border}">
+      <div class="ag-top">
+        <div class="ag-avatar" style="background:rgba(0,0,0,0.3);border:1px solid ${a.color}40">${a.emoji}</div>
+        <div><div class="ag-name" style="color:${a.color}">${a.name}</div><div class="ag-role">${a.role}</div></div>
+      </div>
+      <div class="ag-desc">${a.desc}</div>
+      <div class="ag-status ${a.status==='online'?'ag-online':'ag-offline'}"><div class="status-dot" style="background:${a.status==='online'?'var(--green)':'var(--muted)'}"></div>${a.status.toUpperCase()}</div>
+      <div class="ag-bot">${a.bot}</div>
+    </div>
+  `).join('');
+  // Biz breakdown
+  document.getElementById('bizBreakdown').innerHTML=Object.entries(bizGroups).map(([biz,projects])=>{
+    const m=BIZ_META[biz]||{icon:"📁",color:"#ffc107"};
+    const hours=projects.reduce((s,p)=>s+p.hours,0);
+    const avg=Math.round(projects.reduce((s,p)=>s+p.progress,0)/projects.length);
+    const done=projects.filter(p=>p.status==='done').length;
+    return`<div class="biz-card">
+      <div class="biz-top"><div class="biz-badge" style="background:${m.color}15;border:1px solid ${m.color}30">${m.icon}</div>
+        <div class="biz-name">${biz}</div><div class="biz-pct" style="color:${m.color}">${avg}%</div></div>
+      <div class="biz-mini-stats">
+        <div class="biz-mini"><div class="mn">${projects.length}</div><div class="ml">Projects</div></div>
+        <div class="biz-mini"><div class="mn">${hours}ч</div><div class="ml">Dev Time</div></div>
+        <div class="biz-mini"><div class="mn" style="color:var(--green)">${done}</div><div class="ml">Done</div></div>
+      </div>
+      <div class="biz-progress"><div class="biz-progress-fill" style="width:${avg}%;background:${m.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ RENDER AGENTS FULL ═══
+function renderAgentsFull(){
+  document.getElementById('agentsFull').innerHTML=AGENTS.map(a=>`
+    <div class="agent-card" style="background:${a.bg};border-color:${a.border};margin-bottom:12px">
+      <div class="ag-top">
+        <div class="ag-avatar" style="background:rgba(0,0,0,0.3);border:2px solid ${a.color}60;width:56px;height:56px;font-size:28px">${a.emoji}</div>
+        <div style="flex:1"><div class="ag-name" style="color:${a.color};font-size:18px">${a.name}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'Orbitron',sans-serif">${a.full}</div>
+          <div class="ag-role" style="margin-top:4px">${a.role}</div></div>
+        <div class="ag-status ${a.status==='online'?'ag-online':'ag-offline'}"><div class="status-dot" style="background:${a.status==='online'?'var(--green)':'var(--muted)'}"></div>${a.status.toUpperCase()}</div>
+      </div>
+      <div class="ag-desc" style="font-size:13px;margin-top:8px">${a.desc}</div>
+      <div class="ag-bot" style="margin-top:8px">${a.bot}</div>
+    </div>
+  `).join('');
+}
+
+// ═══ RENDER ANALYTICS ═══
+function renderAnalytics(){
+  const canvas=document.getElementById('statusDonut');const ctx=canvas.getContext('2d');
+  const colors={done:'#66bb6a',active:'#00e5ff',blocked:'#e53935',todo:'#ab47bc'};
+  const entries=Object.entries(statusCounts);let startAngle=-Math.PI/2;
+  ctx.clearRect(0,0,320,320);
+  entries.forEach(([s,c])=>{const angle=(c/totalProjects)*2*Math.PI;
+    ctx.beginPath();ctx.arc(160,160,130,startAngle,startAngle+angle);
+    ctx.strokeStyle=colors[s];ctx.lineWidth=28;ctx.lineCap='round';ctx.stroke();
+    ctx.shadowBlur=15;ctx.shadowColor=colors[s];startAngle+=angle+0.04;ctx.shadowBlur=0});
+  document.getElementById('donutTotal').textContent=totalProjects;
+  document.getElementById('statusLegend').innerHTML=entries.map(([s,c])=>
+    `<div class="legend-item"><div class="legend-dot" style="background:${colors[s]}"></div>${ST[s]}<div class="legend-val">${c}</div></div>`).join('');
+
+  document.getElementById('timeStats').innerHTML=`
+    <div class="a-card"><div class="a-icon">⏱️</div><div class="a-num" style="color:var(--cyan)">${totalHours}</div><div class="a-label">Hours</div><div class="a-sub">${Math.round(totalHours/8)} дней</div></div>
+    <div class="a-card"><div class="a-icon">📅</div><div class="a-num" style="color:var(--gold)">11</div><div class="a-label">Days</div><div class="a-sub">11–21 марта</div></div>
+    <div class="a-card"><div class="a-icon">🔥</div><div class="a-num" style="color:var(--red)">${Math.round(totalHours/11*10)/10}</div><div class="a-label">H/Day</div></div>
+    <div class="a-card"><div class="a-icon">⏳</div><div class="a-num" style="color:var(--purple)">~${estRemaining}</div><div class="a-label">Remaining</div><div class="a-sub">~${Math.ceil(estRemaining/8)} дней</div></div>
+  `;
+
+  const sorted=[...P].sort((a,b)=>b.progress-a.progress);
+  document.getElementById('progressBars').innerHTML=sorted.map(p=>{
+    const c=p.progress>=90?'var(--green)':p.progress>=50?'var(--cyan)':p.progress>=20?'var(--gold)':'var(--red)';
+    return`<div class="bar-row"><div class="bar-label">${p.icon} ${p.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${p.progress}%;background:${c}"></div></div>
+      <div class="bar-val">${p.progress}%</div></div>`}).join('');
+
+  document.getElementById('resourceStats').innerHTML=`
+    <div class="a-card"><div class="a-icon">🪙</div><div class="a-num" style="color:var(--gold)">~7M</div><div class="a-label">Tokens</div><div class="a-sub">5.2M in + 1.8M out</div></div>
+    <div class="a-card"><div class="a-icon">💵</div><div class="a-num" style="color:var(--green)">~$77</div><div class="a-label">AI Cost</div><div class="a-sub">за 11 дней</div></div>
+    <div class="a-card"><div class="a-icon">🔄</div><div class="a-num" style="color:var(--cyan)">15</div><div class="a-label">Compactions</div></div>
+    <div class="a-card"><div class="a-icon">📡</div><div class="a-num" style="color:var(--gold)">~850</div><div class="a-label">API Calls</div></div>
+  `;
+
+  const models=[["Claude Opus",3500000,"var(--gold)",45,"Кодинг, планирование"],["Claude Sonnet",2000000,"var(--cyan)",25,"Основная работа"],["Claude Haiku",800000,"var(--green)",5,"Рутина"],["Claude Vision",500000,"var(--purple)",3,"OCR"],["Whisper",200000,"var(--red)",2,"Голосовые"]];
+  const mx=models[0][1];
+  document.getElementById('modelBars').innerHTML=models.map(([n,t,c,cost,d])=>{
+    const pct=Math.round(t/mx*100);
+    return`<div class="bar-row"><div class="bar-label">${n}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${c}"></div></div><div class="bar-val">$${cost}</div></div>
+      <div style="font-size:10px;color:var(--muted);margin:-4px 0 4px 150px">${d}</div>`}).join('');
+
+  const daily=[{d:"11.03",h:8},{d:"12.03",h:7},{d:"13.03",h:6},{d:"14.03",h:8},{d:"15.03",h:5},{d:"16.03",h:7},{d:"17.03",h:6},{d:"18.03",h:9},{d:"19.03",h:8},{d:"20.03",h:6},{d:"21.03",h:7}];
+  const mxH=Math.max(...daily.map(d=>d.h));
+  document.getElementById('dailyChart').innerHTML=daily.map(d=>{
+    const pct=(d.h/mxH)*100;const c=d.h>=8?'var(--green)':d.h>=6?'var(--cyan)':'var(--gold)';
+    return`<div class="daily-bar"><div style="font-size:9px;font-weight:700;color:var(--gold);font-family:'Orbitron',sans-serif">${d.h}ч</div>
+      <div style="width:100%;background:rgba(255,170,0,.03);border-radius:3px;height:80px;display:flex;align-items:flex-end;border:1px solid rgba(255,170,0,.05)">
+        <div style="width:100%;height:${pct}%;background:${c};border-radius:3px;box-shadow:0 0 8px ${c}30"></div></div>
+      <div style="font-size:8px;color:var(--muted);font-family:'Orbitron',sans-serif">${d.d}</div></div>`}).join('');
+
+  document.getElementById('techBars').innerHTML=techSorted.slice(0,12).map(([t,c])=>{
+    const pct=Math.round(c/totalProjects*100);
+    return`<div class="bar-row"><div class="bar-label">${t}</div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:var(--gold)"></div></div><div class="bar-val">${c}</div></div>`}).join('');
+}
+
+// ═══ RENDER PROJECTS ═══
+function cp(pct,color){const r=14,c=2*Math.PI*r,o=c-(pct/100)*c;
+  return`<div class="cp"><svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="${r}"/>
+    <circle class="bar" cx="18" cy="18" r="${r}" stroke="${color}" stroke-dasharray="${c}" stroke-dashoffset="${o}"/></svg>
+    <div class="pct" style="color:${color}">${pct}%</div></div>`}
+
+function renderProjects(filter){
+  const items=filter==='all'?P:P.filter(p=>p.status===filter);
+  const groups={};items.forEach(p=>{if(!groups[p.biz])groups[p.biz]=[];groups[p.biz].push(p)});
+  let html='';
+  Object.entries(groups).forEach(([biz,projects])=>{
+    const m=BIZ_META[biz]||{icon:"📁",color:"#ffc107"};
+    html+=`<div class="section-title" style="margin-top:16px">${m.icon} ${biz} <div class="line"></div></div>`;
+    html+='<div class="projects-grid">';
+    projects.forEach(p=>{const sc=SC[p.status],bl=p.blocked||[],td=p.todo||[],dn=p.done||[];const has=bl.length||td.length||dn.length;
+      html+=`<div class="p-card" onclick="this.classList.toggle('expanded')">
+        <div class="status-line" style="background:${sc}"></div>
+        <div class="p-head"><div class="p-avatar" style="background:${p.bg}">${p.icon}</div>
+          <div class="p-meta"><div class="p-name">${p.name} <span class="badge badge-${p.status}">${ST[p.status]}</span></div>
+            <div class="p-desc">${p.desc}</div></div></div>
+        <div class="p-footer"><div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}${p.bot?`<span class="tag tag-bot">${p.bot}</span>`:''}</div>${cp(p.progress,sc)}</div>
+        ${has?`<div class="expand-hint">▼ DETAILS</div><div class="p-details"><div class="p-details-inner">
+          ${bl.length?`<div class="dg"><h4 class="h-red">⛔ Blockers</h4>${bl.map(b=>`<div class="di di-r">${b}</div>`).join('')}</div>`:''}
+          ${td.length?`<div class="dg"><h4 class="h-yel">📋 Pending (${td.length})</h4>${td.map(t=>`<div class="di di-t">${t}</div>`).join('')}</div>`:''}
+          ${dn.length?`<div class="dg"><h4 class="h-grn">✅ Done (${dn.length})</h4>${dn.map(d=>`<div class="di di-d">${d}</div>`).join('')}</div>`:''}
+        </div></div>`:''}</div>`});
+    html+='</div>'});
+  document.getElementById('projectsList').innerHTML=html;
+}
+
+// ═══ TIMELINE ═══
+function renderTimeline(){
+  const events=[
+    {date:"11 марта",color:"var(--green)",text:"🚀 Старт: Реферальный бот — полная система за 1 день"},
+    {date:"12 марта",color:"var(--green)",text:"📡 TD Monitor — юзербот + Google Workspace"},
+    {date:"13 марта",color:"var(--cyan)",text:"📋 O.S.C.A.R. — генерация договоров из Bitrix24"},
+    {date:"14 марта",color:"var(--green)",text:"📞 AI звонки через Vapi+Zadarma"},
+    {date:"15 марта",color:"var(--green)",text:"🏢 Virtual Office + CEIDG PDF парсинг"},
+    {date:"16 марта",color:"var(--green)",text:"🤝 K&KUM Sales Bot + анализ e-подписи"},
+    {date:"17 марта",color:"var(--cyan)",text:"💼 Twój Księgowy Bot — AI бухгалтер"},
+    {date:"18 марта",color:"var(--green)",text:"🔄 wFirma OAuth2 + Sync + Bitrix пайплайны"},
+    {date:"19 марта",color:"var(--cyan)",text:"⚠️ Уведомления о долгах + News Hunter"},
+    {date:"20 марта",color:"var(--red)",text:"🔍 reCAPTCHA — Playwright/AI Vision (заблокировано)"},
+    {date:"21 марта",color:"var(--gold)",text:"⚡ A.U.R.U.M. + N.E.X.U.S. + A.R.C.H.O.N. Command Center"},
+    {date:"22 марта",color:"var(--cyan)",text:"🛡️ S.E.N.T.R.Y. daemon + 📡 S.I.R.E.N. Sales Intel + O.S.C.A.R. Bitrix App fixes + Dashboard Auto-Update"},
+  ];
+  document.getElementById('timelineList').innerHTML=events.map((e,i)=>
+    `<div class="tl-item"><div class="tl-dot-col"><div class="tl-dot" style="background:${e.color}"></div>${i<events.length-1?'<div class="tl-line"></div>':''}</div>
+      <div class="tl-content"><div class="tl-date">${e.date}</div><div class="tl-text">${e.text}</div></div></div>`).join('');
+}
+
+// ═══ PLANNED AGENTS ═══
+function renderPlanned(){
+  const tierNames={1:"Tier 1 — Ближайшие",2:"Tier 2 — Среднесрочные",3:"Tier 3 — Долгосрочные"};
+  const tierColors={1:"var(--gold)",2:"var(--cyan)",3:"var(--purple)"};
+  let html='';
+  [1,2,3].forEach(tier=>{
+    const agents=PLANNED.filter(a=>a.tier===tier);
+    if(!agents.length)return;
+    html+=`<div style="margin-bottom:20px">
+      <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:${tierColors[tier]};letter-spacing:2px;margin-bottom:10px;text-transform:uppercase;font-weight:700">
+        ${tierNames[tier]} <div class="line" style="display:inline-block;width:60%;height:1px;background:linear-gradient(90deg,${tierColors[tier]},transparent);vertical-align:middle;margin-left:8px"></div>
+      </div>`;
+    agents.forEach(a=>{
+      html+=`<div style="background:${a.bg};border:1px solid ${a.border};border-radius:12px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,${a.color}33,transparent)"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="font-size:28px">${a.emoji}</span>
+          <div>
+            <div style="font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;color:${a.color}">${a.name}</div>
+            <div style="font-size:9px;color:var(--muted);font-family:'Orbitron',sans-serif;letter-spacing:1px">${a.full}</div>
+          </div>
+          <div style="margin-left:auto;padding:4px 10px;border:1px solid ${tierColors[a.tier]};border-radius:4px;font-size:9px;color:${tierColors[a.tier]};font-family:'Orbitron',sans-serif">PLANNED</div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:'Orbitron',sans-serif;letter-spacing:1px">${a.role}</div>
+        <div style="font-size:13px;color:var(--text);margin-bottom:10px">${a.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${a.planned.map(p=>`<span style="padding:3px 8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:4px;font-size:10px;color:var(--muted)">📌 ${p}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+    html+='</div>';
+  });
+  document.getElementById('plannedAgents').innerHTML=html;
+}
+
+// ═══ FILTERS ═══
+const filters=[{k:'all',l:'ALL'},{k:'active',l:'ACTIVE'},{k:'done',l:'ONLINE'},{k:'blocked',l:'BLOCKED'},{k:'todo',l:'STANDBY'}];
+document.getElementById('filterBar').innerHTML=filters.map(f=>
+  `<button class="tab${f.k==='all'?' active':''}" data-pf="${f.k}">${f.l}</button>`).join('');
+document.querySelectorAll('[data-pf]').forEach(b=>{
+  b.addEventListener('click',()=>{document.querySelectorAll('[data-pf]').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');renderProjects(b.dataset.pf)})});
+
+// ═══ TABS ═══
+document.querySelectorAll('[data-page]').forEach(t=>{
+  t.addEventListener('click',()=>{document.querySelectorAll('[data-page]').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');document.getElementById('page-'+t.dataset.page).classList.add('active')})});
+
+document.getElementById('lastUpdated').textContent=
+  `Last sync: ${new Date().toLocaleString('ru-RU',{timeZone:'Europe/Warsaw',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})} (Warsaw)`;
+
+renderOverview();renderAgentsFull();renderAnalytics();renderProjects('all');renderPlanned();renderTimeline();
+
+try{if(window.Telegram&&window.Telegram.WebApp){const t=window.Telegram.WebApp;t.ready();t.expand()}}catch(e){}
+</script>
+</body>
+</html>
