@@ -332,7 +332,7 @@
 </div>
 
 <div class="footer">
-  <div id="lastUpdated">🕐 Обновлено: 26.03.2026 09:37 | 1/6 агентов | 0/11 сервисов | ⚡ Auto-Update</div>
+  <div id="lastUpdated">🕐 Обновлено: 26.03.2026 12:00 | 3/6 агентов | 6/11 сервисов | ⚡ Auto-Update</div>
   <div style="margin-top:4px">Powered by <a href="#">A.R.C.H.O.N.</a> ⚡ Stark Industries Style</div>
 </div>
 
@@ -359,7 +359,7 @@ const AGENTS = [
     role:"COO / Office Manager",emoji:"📋",
     color:"#ab47bc",bg:"linear-gradient(135deg,#140028,#200040)",border:"rgba(171,71,188,0.2)",
     desc:"Офисный ассистент. Генерация договоров, Bitrix24, CEIDG, задачи на оплату.",
-    bot:"@TDAsystentBiurowybot",status:"offline"},
+    bot:"@TDAsystentBiurowybot",status:"online"},
   {name:"S.I.R.E.N.",full:"Sales Intelligence & Revenue Enhancement Network",
     role:"CSO / Sales Intelligence",emoji:"📡",
     color:"#e53935",bg:"linear-gradient(135deg,#280000,#400000)",border:"rgba(229,57,53,0.2)",
@@ -369,7 +369,7 @@ const AGENTS = [
     role:"CTO / Infrastructure Monitor",emoji:"🛡️",
     color:"#607d8b",bg:"linear-gradient(135deg,#1a2327,#2c3e45)",border:"rgba(96,125,139,0.2)",
     desc:"Фоновый мониторинг всех сервисов. Автоперезапуск, алерты, утренние отчёты.",
-    bot:"daemon",status:"offline"},
+    bot:"daemon",status:"online"},
 ];
 
 // ═══ PLANNED AGENTS ═══
@@ -405,7 +405,7 @@ const P = [
     todo:["Авто-напоминания","Лидерборд","QR-коды"]},
   {biz:"Twoja Decyzja",icon:"📋",bg:"linear-gradient(135deg,#7b1fa2,#ab47bc)",
     name:"O.S.C.A.R.",desc:"Договоры: Bitrix24 + CEIDG → DOCX/PDF + Iron Man HUD",
-    status:"offline",progress:95,tags:["Bitrix24","Bitrix Disk","Gotenberg"],bot:"@TDAsystentBiurowybot",
+    status:"online",progress:95,tags:["Bitrix24","Bitrix Disk","Gotenberg"],bot:"@TDAsystentBiurowybot",
     hours:45,done:["Pakiet 2 из Bitrix24","DOCX→PDF","JDG CEIDG","JDG Google Docs","Доступ","Задачи","Iron Man HUD","Disk Upload (2-step)","Toolbar Button (CRM_DEAL_DETAIL_TOOLBAR)"],
     todo:["Google OAuth","E-подпись","Pakiet 1,3,4"],blocked:["Google OAuth","E-подпись"]},
   {biz:"Twoja Decyzja",icon:"📡",bg:"linear-gradient(135deg,#1b5e20,#66bb6a)",
@@ -475,7 +475,7 @@ const P = [
     hours:8,done:["Дайджест 09:00","Зависшие сделки 6ч","Еженедельный Mon 09:00","Аналитика воронок","Форматирование"],todo:[]},
   {biz:"Инфраструктура",icon:"🛡️",bg:"linear-gradient(135deg,#37474f,#607d8b)",
     name:"S.E.N.T.R.Y.",desc:"Мониторинг 10 сервисов, автоперезапуск, алерты",
-    status:"offline",progress:100,tags:["psutil","httpx","daemon"],
+    status:"online",progress:100,tags:["psutil","httpx","daemon"],
     hours:5,done:["Мониторинг 60с","Автоперезапуск","Алерты Telegram","Утренний отчёт 08:00","cwd-based PID detection"],todo:[]},
   {biz:"Инфраструктура",icon:"📊",bg:"linear-gradient(135deg,#004d40,#26a69a)",
     name:"Projects Dashboard",desc:"Iron Man HUD дашборд + авто-обновление каждый час",
