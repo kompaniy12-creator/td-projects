@@ -376,6 +376,41 @@ const AGENTS = [
     bot:"daemon",status:"online"},
 ];
 
+// ═══ NEW MULTI-AGENT SYSTEM (16 agents, 3 squads) ═══
+const SQUADS = [
+  {
+    name:"DEV SQUAD", icon:"🔧", color:"#3b82f6",
+    agents:[
+      {name:"A.R.C.H.",full:"Architecture & Requirements Coordinator Hub",role:"System Architect",emoji:"🏗",color:"#3b82f6",desc:"Проектирует системы, пишет ТЗ, выбирает технологии. Первый в любой разработке.",skills:["ТЗ","API Design","ERD","Декомпозиция"],status:"idle"},
+      {name:"C.O.D.E.R.",full:"Core Operations & Development Execution Robot",role:"Lead Developer",emoji:"💻",color:"#60a5fa",desc:"Пишет production-ready код. Python, Node.js, TypeScript. Telegram боты, API.",skills:["Python","Node.js","TypeScript","aiogram","FastAPI"],status:"idle"},
+      {name:"R.E.V.I.E.W.",full:"Risk Evaluation & Verification",role:"Code Reviewer",emoji:"🔍",color:"#818cf8",desc:"Code review, безопасность, оптимизация. Ничего не идёт в продакшн без подписи.",skills:["Code Review","Security","Performance"],status:"idle"},
+      {name:"T.E.S.T.",full:"Thorough Evaluation & Systematic Testing",role:"QA Engineer",emoji:"🧪",color:"#a78bfa",desc:"QA инженер. Ломает всё до пользователя. Тесты, баг-репорты.",skills:["pytest","jest","QA","Bug Reports"],status:"idle"},
+      {name:"D.E.V.O.P.S.",full:"Deployment & Virtual Operations Platform Specialist",role:"Infrastructure Engineer",emoji:"⚙️",color:"#94a3b8",desc:"Деплой, LaunchAgents, cloudflared, мониторинг.",skills:["LaunchAgent","cloudflared","Tailscale","SSH"],status:"idle"},
+      {name:"D.E.S.I.G.N.",full:"Digital Experience & Stylistic Interface Generation Node",role:"UI/UX Designer",emoji:"🎨",color:"#f472b6",desc:"UI/UX дизайн. HTML/CSS, Telegram keyboards, дашборды. Mobile-first.",skills:["HTML/CSS","Responsive","Telegram UX"],status:"idle"},
+    ]
+  },
+  {
+    name:"BUSINESS SQUAD", icon:"💼", color:"#8b5cf6",
+    agents:[
+      {name:"A.N.A.L.Y.S.T.",full:"Advanced Numerical Analysis & Logic",role:"Data & BI Analyst",emoji:"📊",color:"#8b5cf6",desc:"Данные в решения. Bitrix24, Supabase, Google Sheets. Отчёты и прогнозы.",skills:["SQL","Pandas","Bitrix API","Sheets"],status:"idle"},
+      {name:"C.R.M.",full:"Client Relations Manager",role:"CRM Manager (Bitrix24)",emoji:"🤝",color:"#a78bfa",desc:"Bitrix24: сделки TD и K&KUM, напоминания, сводки по клиентам.",skills:["Bitrix24","Воронки","S.I.R.E.N."],status:"idle"},
+      {name:"F.I.N.A.N.C.E.",full:"Financial Intelligence & Numerical Analysis",role:"Financial Controller",emoji:"💰",color:"#10b981",desc:"Платёжный календарь, P&L по бизнесам, контроль дебиторки.",skills:["Платежи","P&L","ZUS/US","Calendar"],status:"idle"},
+      {name:"L.E.G.A.L.",full:"Legislation Expert & General Assistance for Legalization",role:"Legal Assistant (PL)",emoji:"⚖️",color:"#f59e0b",desc:"Польское право, Karta Pobytu, договоры TD. Дедлайны → Calendar.",skills:["Karta Pobytu","Договоры","O.S.C.A.R."],status:"idle"},
+      {name:"S.A.L.E.S.",full:"Strategic Acquisition & Lead Engagement System",role:"Sales Manager",emoji:"🚀",color:"#ef4444",desc:"Лиды K&KUM и TD. Скрипты продаж, воронки, follow-up.",skills:["Лиды","Скрипты","K&KUM","Bitrix"],status:"idle"},
+      {name:"H.R.",full:"Human Resources & Roles Coordinator",role:"HR Manager",emoji:"👥",color:"#6366f1",desc:"Команда TD и K&KUM. Задачи, KPI, дедлайны. Паша, Денис, Анна, Вика.",skills:["KPI","Задачи","Onboarding"],status:"idle"},
+    ]
+  },
+  {
+    name:"PERSONAL SQUAD", icon:"👤", color:"#10b981",
+    agents:[
+      {name:"S.C.H.E.D.",full:"Smart Calendar & Hours Efficiency Director",role:"Personal Scheduler",emoji:"📅",color:"#10b981",desc:"17 календарей Google. Встречи с Meet, напоминания за 60/30/10 мин.",skills:["Google Calendar","Google Meet","09:30-17:00"],status:"active"},
+      {name:"R.E.S.E.A.R.C.H.",full:"Retrieval & Expert Synthesis Engine",role:"Research Analyst",emoji:"🔬",color:"#06b6d4",desc:"Ищет, анализирует, дайджесты. Польское право, рынки, конкуренты, AI тренды.",skills:["Web Search","PDF Analysis","Дайджесты"],status:"idle"},
+      {name:"H.E.A.L.T.H.",full:"Habit Enforcement & Lifestyle Tracking Hub",role:"Wellness Tracker",emoji:"💪",color:"#34d399",desc:"Перерывы, вода, движение. Воскресный check-in. Баланс работа/жизнь.",skills:["Перерывы","Режим","Check-in"],status:"idle"},
+      {name:"I.N.B.O.X.",full:"Intelligent Notification & Business Operations eXchange",role:"Communications Manager",emoji:"📬",color:"#fb923c",desc:"Gmail дайджест 08:30 / 13:00 / 17:00. Только важное доходит до Серго.",skills:["Gmail","Приоритизация","Дайджест"],status:"active"},
+    ]
+  }
+];
+
 // ═══ PLANNED AGENTS ═══
 const PLANNED = [
   {name:"O.R.A.C.L.E.",full:"Operational Research & Analytics for Client Lifecycle Enhancement",
@@ -691,78 +726,6 @@ function renderTimeline(){
   document.getElementById('timelineList').innerHTML=events.map((e,i)=>
     `<div class="tl-item"><div class="tl-dot-col"><div class="tl-dot" style="background:${e.color}"></div>${i<events.length-1?'<div class="tl-line"></div>':''}</div>
       <div class="tl-content"><div class="tl-date">${e.date}</div><div class="tl-text">${e.text}</div></div></div>`).join('');
-}
-
-// ═══ NEW MULTI-AGENT SYSTEM (16 agents, 3 squads) ═══
-const SQUADS = [
-  {
-    name:"DEV SQUAD", icon:"🔧", color:"#3b82f6",
-    agents:[
-      {name:"A.R.C.H.",full:"Architecture & Requirements Coordinator Hub",role:"System Architect",emoji:"🏗",color:"#3b82f6",desc:"Проектирует системы, пишет ТЗ, выбирает технологии. Первый в любой разработке.",skills:["ТЗ","API Design","ERD","Декомпозиция"],status:"idle"},
-      {name:"C.O.D.E.R.",full:"Core Operations & Development Execution Robot",role:"Lead Developer",emoji:"💻",color:"#60a5fa",desc:"Пишет production-ready код. Python, Node.js, TypeScript. Telegram боты, API.",skills:["Python","Node.js","TypeScript","aiogram","FastAPI"],status:"idle"},
-      {name:"R.E.V.I.E.W.",full:"Risk Evaluation & Verification",role:"Code Reviewer",emoji:"🔍",color:"#818cf8",desc:"Code review, безопасность, оптимизация. Ничего не идёт в продакшн без подписи.",skills:["Code Review","Security","Performance"],status:"idle"},
-      {name:"T.E.S.T.",full:"Thorough Evaluation & Systematic Testing",role:"QA Engineer",emoji:"🧪",color:"#a78bfa",desc:"QA инженер. Ломает всё до пользователя. Тесты, баг-репорты.",skills:["pytest","jest","QA","Bug Reports"],status:"idle"},
-      {name:"D.E.V.O.P.S.",full:"Deployment & Virtual Operations Platform Specialist",role:"Infrastructure Engineer",emoji:"⚙️",color:"#94a3b8",desc:"Деплой, LaunchAgents, cloudflared, мониторинг.",skills:["LaunchAgent","cloudflared","Tailscale","SSH"],status:"idle"},
-      {name:"D.E.S.I.G.N.",full:"Digital Experience & Stylistic Interface Generation Node",role:"UI/UX Designer",emoji:"🎨",color:"#f472b6",desc:"UI/UX дизайн. HTML/CSS, Telegram keyboards, дашборды. Mobile-first.",skills:["HTML/CSS","Responsive","Telegram UX"],status:"idle"},
-    ]
-  },
-  {
-    name:"BUSINESS SQUAD", icon:"💼", color:"#8b5cf6",
-    agents:[
-      {name:"A.N.A.L.Y.S.T.",full:"Advanced Numerical Analysis & Logic",role:"Data & BI Analyst",emoji:"📊",color:"#8b5cf6",desc:"Данные в решения. Bitrix24, Supabase, Google Sheets. Отчёты и прогнозы.",skills:["SQL","Pandas","Bitrix API","Sheets"],status:"idle"},
-      {name:"C.R.M.",full:"Client Relations Manager",role:"CRM Manager (Bitrix24)",emoji:"🤝",color:"#a78bfa",desc:"Bitrix24: сделки TD и K&KUM, напоминания, сводки по клиентам.",skills:["Bitrix24","Воронки","S.I.R.E.N."],status:"idle"},
-      {name:"F.I.N.A.N.C.E.",full:"Financial Intelligence & Numerical Analysis",role:"Financial Controller",emoji:"💰",color:"#10b981",desc:"Платёжный календарь, P&L по бизнесам, контроль дебиторки.",skills:["Платежи","P&L","ZUS/US","Calendar"],status:"idle"},
-      {name:"L.E.G.A.L.",full:"Legislation Expert & General Assistance for Legalization",role:"Legal Assistant (PL)",emoji:"⚖️",color:"#f59e0b",desc:"Польское право, Karta Pobytu, договоры TD. Дедлайны → Calendar.",skills:["Karta Pobytu","Договоры","O.S.C.A.R."],status:"idle"},
-      {name:"S.A.L.E.S.",full:"Strategic Acquisition & Lead Engagement System",role:"Sales Manager",emoji:"🚀",color:"#ef4444",desc:"Лиды K&KUM и TD. Скрипты продаж, воронки, follow-up.",skills:["Лиды","Скрипты","K&KUM","Bitrix"],status:"idle"},
-      {name:"H.R.",full:"Human Resources & Roles Coordinator",role:"HR Manager",emoji:"👥",color:"#6366f1",desc:"Команда TD и K&KUM. Задачи, KPI, дедлайны. Паша, Денис, Анна, Вика.",skills:["KPI","Задачи","Onboarding"],status:"idle"},
-    ]
-  },
-  {
-    name:"PERSONAL SQUAD", icon:"👤", color:"#10b981",
-    agents:[
-      {name:"S.C.H.E.D.",full:"Smart Calendar & Hours Efficiency Director",role:"Personal Scheduler",emoji:"📅",color:"#10b981",desc:"17 календарей Google. Встречи с Meet, напоминания за 60/30/10 мин.",skills:["Google Calendar","Google Meet","09:30-17:00"],status:"active"},
-      {name:"R.E.S.E.A.R.C.H.",full:"Retrieval & Expert Synthesis Engine",role:"Research Analyst",emoji:"🔬",color:"#06b6d4",desc:"Ищет, анализирует, дайджесты. Польское право, рынки, конкуренты, AI тренды.",skills:["Web Search","PDF Analysis","Дайджесты"],status:"idle"},
-      {name:"H.E.A.L.T.H.",full:"Habit Enforcement & Lifestyle Tracking Hub",role:"Wellness Tracker",emoji:"💪",color:"#34d399",desc:"Перерывы, вода, движение. Воскресный check-in. Баланс работа/жизнь.",skills:["Перерывы","Режим","Check-in"],status:"idle"},
-      {name:"I.N.B.O.X.",full:"Intelligent Notification & Business Operations eXchange",role:"Communications Manager",emoji:"📬",color:"#fb923c",desc:"Gmail дайджест 08:30 / 13:00 / 17:00. Только важное доходит до Серго.",skills:["Gmail","Приоритизация","Дайджест"],status:"active"},
-    ]
-  }
-];
-
-// ═══ RENDER SQUADS ═══
-function renderSquads(){
-  const container = document.getElementById('agentsFull');
-  let html = '';
-  SQUADS.forEach(squad => {
-    html += `<div style="margin-bottom:28px">
-      <div class="section-title" style="color:${squad.color}">
-        ${squad.icon} ${squad.name}
-        <div class="line" style="background:linear-gradient(90deg,${squad.color}66,transparent)"></div>
-      </div>
-      <div class="agents-grid">`;
-    squad.agents.forEach(a => {
-      const isActive = a.status === 'active';
-      const statusColor = isActive ? 'var(--green)' : 'var(--muted)';
-      const statusLabel = isActive ? 'ACTIVE' : 'IDLE';
-      html += `<div class="agent-card" style="background:linear-gradient(135deg,${a.color}08,rgba(0,0,0,0.4));border-color:${a.color}30;--before-bg:${a.color}">
-        <div class="ag-top">
-          <div class="ag-avatar" style="background:${a.color}15;border:1px solid ${a.color}40;font-size:22px">${a.emoji}</div>
-          <div style="flex:1;min-width:0">
-            <div class="ag-name" style="color:${a.color};font-size:13px">${a.name}</div>
-            <div class="ag-role">${a.role}</div>
-          </div>
-          <div class="ag-status ${isActive?'ag-online':'ag-offline'}">
-            <div class="status-dot" style="background:${statusColor}"></div>${statusLabel}
-          </div>
-        </div>
-        <div class="ag-desc">${a.desc}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
-          ${a.skills.map(s=>`<span style="background:${a.color}10;border:1px solid ${a.color}20;color:${a.color};padding:2px 7px;border-radius:4px;font-size:9px;font-family:'Orbitron',sans-serif">${s}</span>`).join('')}
-        </div>
-      </div>`;
-    });
-    html += `</div></div>`;
-  });
-  container.innerHTML = html;
 }
 
 // ═══ PLANNED AGENTS ═══
