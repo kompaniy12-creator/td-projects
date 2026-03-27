@@ -604,7 +604,52 @@ function renderOverview(){
   }).join('');
 }
 
-// ═══ RENDER AGENTS FULL ═══
+// ═══ RENDER SQUADS (16 new agents) ═══
+function renderSquads(){
+  const container = document.getElementById('agentsFull');
+  let html = '<div style="margin-bottom:20px"><div class="section-title" style="color:var(--cyan)">🤖 Original Agents <div class="line"></div></div>';
+  html += AGENTS.map(a=>`
+    <div class="agent-card" style="background:${a.bg};border-color:${a.border};margin-bottom:12px">
+      <div class="ag-top">
+        <div class="ag-avatar" style="background:rgba(0,0,0,0.3);border:2px solid ${a.color}60;width:56px;height:56px;font-size:28px">${a.emoji}</div>
+        <div style="flex:1"><div class="ag-name" style="color:${a.color};font-size:16px">${a.name}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:'Orbitron',sans-serif">${a.full}</div>
+          <div class="ag-role" style="margin-top:4px">${a.role}</div></div>
+        <div class="ag-status ${a.status==='online'?'ag-online':'ag-offline'}"><div class="status-dot" style="background:${a.status==='online'?'var(--green)':'var(--muted)'}"></div>${a.status.toUpperCase()}</div>
+      </div>
+      <div class="ag-desc" style="font-size:13px;margin-top:8px">${a.desc}</div>
+      <div class="ag-bot" style="margin-top:8px">${a.bot}</div>
+    </div>`).join('');
+  html += '</div>';
+  SQUADS.forEach(squad => {
+    html += `<div style="margin-bottom:28px">
+      <div class="section-title" style="color:${squad.color}">${squad.icon} ${squad.name} <div class="line" style="background:linear-gradient(90deg,${squad.color}66,transparent)"></div></div>
+      <div class="agents-grid">`;
+    squad.agents.forEach(a => {
+      const isActive = a.status === 'active';
+      html += `<div class="agent-card" style="background:linear-gradient(135deg,${a.color}08,rgba(0,0,0,0.4));border-color:${a.color}30">
+        <div class="ag-top">
+          <div class="ag-avatar" style="background:${a.color}15;border:1px solid ${a.color}40;font-size:22px">${a.emoji}</div>
+          <div style="flex:1;min-width:0">
+            <div class="ag-name" style="color:${a.color};font-size:13px">${a.name}</div>
+            <div class="ag-role">${a.role}</div>
+          </div>
+          <div class="ag-status ${isActive?'ag-online':'ag-offline'}">
+            <div class="status-dot" style="background:${isActive?'var(--green)':'var(--muted)'}"></div>${isActive?'ACTIVE':'IDLE'}
+          </div>
+        </div>
+        <div class="ag-desc">${a.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+          ${a.skills.map(s=>`<span style="background:${a.color}10;border:1px solid ${a.color}20;color:${a.color};padding:2px 7px;border-radius:4px;font-size:9px;font-family:'Orbitron',sans-serif">${s}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ═══ RENDER AGENTS FULL (legacy, replaced by renderSquads) ═══
 function renderAgentsFull(){
   document.getElementById('agentsFull').innerHTML=AGENTS.map(a=>`
     <div class="agent-card" style="background:${a.bg};border-color:${a.border};margin-bottom:12px">
