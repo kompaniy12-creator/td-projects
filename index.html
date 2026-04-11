@@ -337,7 +337,7 @@
 </div>
 
 <div class="footer">
-  <div id="lastUpdated">🕐 Обновлено: 08.04.2026 21:01 | 4/6 агентов | 6/11 сервисов | ⚡ Auto-Update</div>
+  <div id="lastUpdated">🕐 Обновлено: 11.04.2026 21:10 | 6/6 агентов | 9/11 сервисов | ⚡ Auto-Update</div>
   <div style="margin-top:4px">Powered by <a href="#">A.R.C.H.O.N.</a> ⚡ Stark Industries Style</div>
 </div>
 
@@ -359,7 +359,7 @@ const AGENTS = [
     role:"CFO / Financial Analyst",emoji:"💰",
     color:"#66bb6a",bg:"linear-gradient(135deg,#001400,#002800)",border:"rgba(102,187,106,0.2)",
     desc:"Финансовый интеллект. Чеки, голосовые, текст → Notion. Анализ расходов и прибыли.",
-    bot:"@TDfinanalyst_bot",status:"offline"},
+    bot:"@TDfinanalyst_bot",status:"online"},
   {name:"O.S.C.A.R.",full:"Office System for Contracts, Automation & Reporting",
     role:"COO / Office Manager",emoji:"📋",
     color:"#ab47bc",bg:"linear-gradient(135deg,#140028,#200040)",border:"rgba(171,71,188,0.2)",
@@ -374,7 +374,7 @@ const AGENTS = [
     role:"CTO / Infrastructure Monitor",emoji:"🛡️",
     color:"#607d8b",bg:"linear-gradient(135deg,#1a2327,#2c3e45)",border:"rgba(96,125,139,0.2)",
     desc:"Фоновый мониторинг всех сервисов. Автоперезапуск, алерты, утренние отчёты.",
-    bot:"daemon",status:"offline"},
+    bot:"daemon",status:"online"},
 ];
 
 // ═══ NEW MULTI-AGENT SYSTEM (16 agents, 3 squads) ═══
@@ -495,7 +495,7 @@ const P = [
     todo:["Google Calendar","Gmail","Привычки"]},
   {biz:"Личные",icon:"💰",bg:"linear-gradient(135deg,#1b5e20,#66bb6a)",
     name:"A.U.R.U.M.",desc:"Финансовый аналитик: чеки → SQLite + дашборд",
-    status:"offline",progress:100,tags:["Claude Vision","Whisper","SQLite"],bot:"@TDfinanalyst_bot",
+    status:"online",progress:100,tags:["Claude Vision","Whisper","SQLite"],bot:"@TDfinanalyst_bot",
     hours:12,done:["OCR чеков","Голосовые","Текст","16 категорий","SQLite","Дашборд","Бюджеты","Мульти-счета","Инвестиции","Динамика баланса","Статистика","FAB +","Редактирование","Notion DB fix"],
     todo:["Банковская синхронизация","Групповой доступ"]},
   {biz:"Инфраструктура",icon:"🔐",bg:"linear-gradient(135deg,#37474f,#607d8b)",
@@ -515,7 +515,7 @@ const P = [
     hours:8,done:["Дайджест 09:00","Зависшие сделки 6ч","Еженедельный Mon 09:00","Аналитика воронок","Форматирование"],todo:[]},
   {biz:"Инфраструктура",icon:"🛡️",bg:"linear-gradient(135deg,#37474f,#607d8b)",
     name:"S.E.N.T.R.Y.",desc:"Мониторинг 10 сервисов, автоперезапуск, алерты",
-    status:"offline",progress:100,tags:["psutil","httpx","daemon"],
+    status:"online",progress:100,tags:["psutil","httpx","daemon"],
     hours:5,done:["Мониторинг 60с","Автоперезапуск","Алерты Telegram","Утренний отчёт 08:00","cwd-based PID detection"],todo:[]},
   {biz:"Инфраструктура",icon:"📊",bg:"linear-gradient(135deg,#004d40,#26a69a)",
     name:"Projects Dashboard",desc:"Iron Man HUD дашборд + авто-обновление каждый час",
