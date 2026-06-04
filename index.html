@@ -337,7 +337,7 @@
 </div>
 
 <div class="footer">
-  <div id="lastUpdated">🕐 Обновлено: 04.06.2026 00:00 | 6/6 агентов | 9/11 сервисов | ⚡ Auto-Update</div>
+  <div id="lastUpdated">🕐 Обновлено: 04.06.2026 03:01 | 5/5 агентов | 8/10 сервисов | ⚡ Auto-Update</div>
   <div style="margin-top:4px">Powered by <a href="#">A.R.C.H.O.N.</a> ⚡ Stark Industries Style</div>
 </div>
 
@@ -355,11 +355,6 @@ const AGENTS = [
     color:"#42a5f5",bg:"linear-gradient(135deg,#001428,#002040)",border:"rgba(66,165,245,0.2)",
     desc:"Операционное управление. Голосовые команды, звонки, сообщения, задачи, календарь. Самоулучшающийся.",
     bot:"@nexus_prrsonal_bot",status:"online"},
-  {name:"A.U.R.U.M.",full:"Automated Universal Resource & Utility Manager",
-    role:"CFO / Financial Analyst",emoji:"💰",
-    color:"#66bb6a",bg:"linear-gradient(135deg,#001400,#002800)",border:"rgba(102,187,106,0.2)",
-    desc:"Финансовый интеллект. Чеки, голосовые, текст → Notion. Анализ расходов и прибыли.",
-    bot:"@TDfinanalyst_bot",status:"online"},
   {name:"O.S.C.A.R.",full:"Office System for Contracts, Automation & Reporting",
     role:"COO / Office Manager",emoji:"📋",
     color:"#ab47bc",bg:"linear-gradient(135deg,#140028,#200040)",border:"rgba(171,71,188,0.2)",
@@ -493,11 +488,6 @@ const P = [
     status:"online",progress:90,tags:["Claude Sonnet","Whisper","Vapi"],bot:"@nexus_prrsonal_bot",
     hours:6,done:["Голосовые команды","AI brain","Звонки","Сообщения","Задачи","Погода","Брифинги","Self-improve"],
     todo:["Google Calendar","Gmail","Привычки"]},
-  {biz:"Личные",icon:"💰",bg:"linear-gradient(135deg,#1b5e20,#66bb6a)",
-    name:"A.U.R.U.M.",desc:"Финансовый аналитик: чеки → SQLite + дашборд",
-    status:"online",progress:100,tags:["Claude Vision","Whisper","SQLite"],bot:"@TDfinanalyst_bot",
-    hours:12,done:["OCR чеков","Голосовые","Текст","16 категорий","SQLite","Дашборд","Бюджеты","Мульти-счета","Инвестиции","Динамика баланса","Статистика","FAB +","Редактирование","Notion DB fix"],
-    todo:["Банковская синхронизация","Групповой доступ"]},
   {biz:"Инфраструктура",icon:"🔐",bg:"linear-gradient(135deg,#37474f,#607d8b)",
     name:"Google Workspace",desc:"Календарь, Drive, Sheets, Gmail",
     status:"blocked",progress:80,tags:["Google API"],hours:6,
@@ -773,7 +763,7 @@ function renderTimeline(){
     {date:"18 марта",color:"var(--green)",text:"🔄 wFirma OAuth2 + Sync + Bitrix пайплайны"},
     {date:"19 марта",color:"var(--cyan)",text:"⚠️ Уведомления о долгах + News Hunter"},
     {date:"20 марта",color:"var(--red)",text:"🔍 reCAPTCHA — Playwright/AI Vision (заблокировано)"},
-    {date:"21 марта",color:"var(--gold)",text:"⚡ A.U.R.U.M. + N.E.X.U.S. + A.R.C.H.O.N. Command Center"},
+    {date:"21 марта",color:"var(--gold)",text:"⚡ N.E.X.U.S. + A.R.C.H.O.N. Command Center"},
     {date:"22 марта",color:"var(--cyan)",text:"🛡️ S.E.N.T.R.Y. daemon + 📡 S.I.R.E.N. Sales Intel + O.S.C.A.R. Bitrix App fixes + Dashboard Auto-Update"},
   ];
   document.getElementById('timelineList').innerHTML=events.map((e,i)=>
