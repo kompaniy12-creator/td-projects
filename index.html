@@ -337,7 +337,7 @@
 </div>
 
 <div class="footer">
-  <div id="lastUpdated">🕐 Обновлено: 06.06.2026 09:01 | 3/3 агентов | 5/6 сервисов | ⚡ Auto-Update</div>
+  <div id="lastUpdated">🕐 Обновлено: 06.06.2026 12:00 | 2/2 агентов | 4/5 сервисов | ⚡ Auto-Update</div>
   <div style="margin-top:4px">Powered by <a href="#">A.R.C.H.O.N.</a> ⚡ Stark Industries Style</div>
 </div>
 
@@ -350,11 +350,6 @@ const AGENTS = [
     color:"#ffc107",bg:"linear-gradient(135deg,#1a1400,#2a2000)",border:"rgba(255,193,7,0.2)",
     desc:"Главный интеллект системы. Управляет всеми ботами, принимает стратегические решения, синхронизирует бизнес.",
     bot:"@nexusassbot",status:"online"},
-  {name:"S.I.R.E.N.",full:"Sales Intelligence & Revenue Enhancement Network",
-    role:"CSO / Sales Intelligence",emoji:"📡",
-    color:"#e53935",bg:"linear-gradient(135deg,#280000,#400000)",border:"rgba(229,57,53,0.2)",
-    desc:"Аналитика продаж. Дайджесты, зависшие сделки, конверсия воронок, еженедельные отчёты.",
-    bot:"@siren_sales_bot",status:"online"},
   {name:"S.E.N.T.R.Y.",full:"System Environment & Network Testing Registry",
     role:"CTO / Infrastructure Monitor",emoji:"🛡️",
     color:"#607d8b",bg:"linear-gradient(135deg,#1a2327,#2c3e45)",border:"rgba(96,125,139,0.2)",
@@ -379,7 +374,7 @@ const SQUADS = [
     name:"BUSINESS SQUAD", icon:"💼", color:"#8b5cf6",
     agents:[
       {name:"A.N.A.L.Y.S.T.",full:"Advanced Numerical Analysis & Logic",role:"Data & BI Analyst",emoji:"📊",color:"#8b5cf6",desc:"Данные в решения. Bitrix24, Supabase, Google Sheets. Отчёты и прогнозы.",skills:["SQL","Pandas","Bitrix API","Sheets"],status:"idle"},
-      {name:"C.R.M.",full:"Client Relations Manager",role:"CRM Manager (Bitrix24)",emoji:"🤝",color:"#a78bfa",desc:"Bitrix24: сделки TD и K&KUM, напоминания, сводки по клиентам.",skills:["Bitrix24","Воронки","S.I.R.E.N."],status:"idle"},
+      {name:"C.R.M.",full:"Client Relations Manager",role:"CRM Manager (Bitrix24)",emoji:"🤝",color:"#a78bfa",desc:"Bitrix24: сделки TD и K&KUM, напоминания, сводки по клиентам.",skills:["Bitrix24","Воронки","CRM"],status:"idle"},
       {name:"F.I.N.A.N.C.E.",full:"Financial Intelligence & Numerical Analysis",role:"Financial Controller",emoji:"💰",color:"#10b981",desc:"Платёжный календарь, P&L по бизнесам, контроль дебиторки.",skills:["Платежи","P&L","ZUS/US","Calendar"],status:"idle"},
       {name:"L.E.G.A.L.",full:"Legislation Expert & General Assistance for Legalization",role:"Legal Assistant (PL)",emoji:"⚖️",color:"#f59e0b",desc:"Польское право, Karta Pobytu, договоры TD. Дедлайны → Calendar.",skills:["Karta Pobytu","Договоры","Legal Docs"],status:"idle"},
       {name:"S.A.L.E.S.",full:"Strategic Acquisition & Lead Engagement System",role:"Sales Manager",emoji:"🚀",color:"#ef4444",desc:"Лиды K&KUM и TD. Скрипты продаж, воронки, follow-up.",skills:["Лиды","Скрипты","K&KUM","Bitrix"],status:"idle"},
@@ -479,10 +474,6 @@ const P = [
     name:"E-подпись",desc:"Autenti / Yousign",
     status:"blocked",progress:15,tags:["Autenti"],hours:4,
     done:["Autenti приложение","Анализ альтернатив"],todo:["Выбрать сервис"],blocked:["APIv2"]},
-  {biz:"Инфраструктура",icon:"📡",bg:"linear-gradient(135deg,#b71c1c,#e53935)",
-    name:"S.I.R.E.N.",desc:"Sales Intelligence: дайджесты, зависшие сделки, воронки",
-    status:"online",progress:100,tags:["Bitrix24","APScheduler","Claude"],bot:"@siren_sales_bot",
-    hours:8,done:["Дайджест 09:00","Зависшие сделки 6ч","Еженедельный Mon 09:00","Аналитика воронок","Форматирование"],todo:[]},
   {biz:"Инфраструктура",icon:"🛡️",bg:"linear-gradient(135deg,#37474f,#607d8b)",
     name:"S.E.N.T.R.Y.",desc:"Мониторинг 10 сервисов, автоперезапуск, алерты",
     status:"online",progress:100,tags:["psutil","httpx","daemon"],
@@ -743,7 +734,7 @@ function renderTimeline(){
     {date:"19 марта",color:"var(--cyan)",text:"⚠️ Уведомления о долгах + News Hunter"},
     {date:"20 марта",color:"var(--red)",text:"🔍 reCAPTCHA — Playwright/AI Vision (заблокировано)"},
     {date:"21 марта",color:"var(--gold)",text:"⚡ A.R.C.H.O.N. Command Center"},
-    {date:"22 марта",color:"var(--cyan)",text:"🛡️ S.E.N.T.R.Y. daemon + 📡 S.I.R.E.N. Sales Intel + Dashboard Auto-Update"},
+    {date:"22 марта",color:"var(--cyan)",text:"🛡️ S.E.N.T.R.Y. daemon + Dashboard Auto-Update"},
   ];
   document.getElementById('timelineList').innerHTML=events.map((e,i)=>
     `<div class="tl-item"><div class="tl-dot-col"><div class="tl-dot" style="background:${e.color}"></div>${i<events.length-1?'<div class="tl-line"></div>':''}</div>
