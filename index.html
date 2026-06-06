@@ -337,7 +337,7 @@
 </div>
 
 <div class="footer">
-  <div id="lastUpdated">🕐 Обновлено: 06.06.2026 06:01 | 4/4 агентов | 6/7 сервисов | ⚡ Auto-Update</div>
+  <div id="lastUpdated">🕐 Обновлено: 06.06.2026 09:01 | 3/3 агентов | 5/6 сервисов | ⚡ Auto-Update</div>
   <div style="margin-top:4px">Powered by <a href="#">A.R.C.H.O.N.</a> ⚡ Stark Industries Style</div>
 </div>
 
@@ -350,11 +350,6 @@ const AGENTS = [
     color:"#ffc107",bg:"linear-gradient(135deg,#1a1400,#2a2000)",border:"rgba(255,193,7,0.2)",
     desc:"Главный интеллект системы. Управляет всеми ботами, принимает стратегические решения, синхронизирует бизнес.",
     bot:"@nexusassbot",status:"online"},
-  {name:"N.E.X.U.S.",full:"Network for Execution & Unified Systems",
-    role:"CEO / Personal Assistant",emoji:"🧠",
-    color:"#42a5f5",bg:"linear-gradient(135deg,#001428,#002040)",border:"rgba(66,165,245,0.2)",
-    desc:"Операционное управление. Голосовые команды, звонки, сообщения, задачи, календарь. Самоулучшающийся.",
-    bot:"@nexus_prrsonal_bot",status:"online"},
   {name:"S.I.R.E.N.",full:"Sales Intelligence & Revenue Enhancement Network",
     role:"CSO / Sales Intelligence",emoji:"📡",
     color:"#e53935",bg:"linear-gradient(135deg,#280000,#400000)",border:"rgba(229,57,53,0.2)",
@@ -473,11 +468,6 @@ const P = [
     name:"Фриланс-платформы",desc:"Upwork + Fiverr + Useme",
     status:"todo",progress:10,tags:["Upwork","Fiverr"],hours:3,
     done:["Анализ 8+ платформ"],todo:["Профили","Портфолио","4 гига"]},
-  {biz:"Личные",icon:"🧠",bg:"linear-gradient(135deg,#0d47a1,#42a5f5)",
-    name:"N.E.X.U.S.",desc:"Персональный ассистент: голос, звонки, задачи",
-    status:"online",progress:90,tags:["Claude Sonnet","Whisper","Vapi"],bot:"@nexus_prrsonal_bot",
-    hours:6,done:["Голосовые команды","AI brain","Звонки","Сообщения","Задачи","Погода","Брифинги","Self-improve"],
-    todo:["Google Calendar","Gmail","Привычки"]},
   {biz:"Инфраструктура",icon:"🔐",bg:"linear-gradient(135deg,#37474f,#607d8b)",
     name:"Google Workspace",desc:"Календарь, Drive, Sheets, Gmail",
     status:"blocked",progress:80,tags:["Google API"],hours:6,
@@ -752,7 +742,7 @@ function renderTimeline(){
     {date:"18 марта",color:"var(--green)",text:"🔄 wFirma OAuth2 + Sync + Bitrix пайплайны"},
     {date:"19 марта",color:"var(--cyan)",text:"⚠️ Уведомления о долгах + News Hunter"},
     {date:"20 марта",color:"var(--red)",text:"🔍 reCAPTCHA — Playwright/AI Vision (заблокировано)"},
-    {date:"21 марта",color:"var(--gold)",text:"⚡ N.E.X.U.S. + A.R.C.H.O.N. Command Center"},
+    {date:"21 марта",color:"var(--gold)",text:"⚡ A.R.C.H.O.N. Command Center"},
     {date:"22 марта",color:"var(--cyan)",text:"🛡️ S.E.N.T.R.Y. daemon + 📡 S.I.R.E.N. Sales Intel + Dashboard Auto-Update"},
   ];
   document.getElementById('timelineList').innerHTML=events.map((e,i)=>
